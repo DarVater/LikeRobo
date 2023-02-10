@@ -11,7 +11,8 @@ from kivy.uix.behaviors import DragBehavior
 from kivy.animation import Animation
 from kivy.graphics.context_instructions import PopMatrix, PushMatrix
 from kivy.graphics import Rotate
-from kivy.uix.spinner import Spinner
+from language_screen import LanguageScreen
+
 
 Window.size = (400, 800)
 
@@ -25,7 +26,7 @@ class FlashCardScreen(Screen):
         self.y = 0
 
     def add_back_btn(self):
-        self.button = Button(text=text_map[selected_language]['mein_menu_title'],
+        self.button = Button(text=lang_core.get_text_from_map('mein_menu_title'),
                              size_hint=[1, .1],
                              pos_hint={'right': 1, 'top': 1})
         self.button.bind(on_press=self.goto_main)
@@ -140,73 +141,20 @@ class MainScreen(Screen):
         screen_manager.current = 'screen2'
 
 
-languages = ['Украинский', 'Русский']
-selected_language = 'Русский'
-
-# Example mapping of interface text to different languages
-text_map = {
-    'Русский': {
-        'mein_menu_title': 'Главное меню',
-        'settings_title': 'Настройки',
-        'bind_title': 'Загружать\n   навык',
-        'exit_title': 'Выход',
-    },
-    'Украинский': {
-        'mein_menu_title': 'Главне меню',
-        'bind_title': 'Загружать\n навичку',
-        'settings_title': 'Настройки',
-        'exit_title': 'Вихід',
-    }
-}
-
-class LanguageScreen(Screen):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        global selected_language
-        self.spinner = Spinner(
-            text=selected_language,
-            values=languages,
-            size_hint=(0.5, 0.2),
-            pos_hint={'center_x': 0.5, 'center_y': 0.5},
-        )
-        self.add_back_btn()
-        self.add_widget(self.spinner)
-
-    def update_language(self):
-        global selected_language, screen_manager
-        selected_language = self.spinner.text
-        screen_manager.clear_widgets()
-        screen_manager.add_widget(MainScreen(name='screen1'))
-        screen_manager.add_widget(RoadmapScreen(name='screen2'))
-        screen_manager.add_widget(FlashCardScreen(name='screen3'))
-        screen_manager.add_widget(LanguageScreen(name='screen4'))
-        print(self.spinner.text)
-
-    def add_back_btn(self):
-        self.button = Button(text=text_map[selected_language]['mein_menu_title'],
-                             size_hint=[1, .1],
-                             pos_hint={'right': 1, 'top': 1})
-        self.button.bind(on_press=self.goto_main)
-        self.add_widget(self.button)
-
-    def goto_main(self, instance):
-        self.update_language()
-        animation = Animation(y=-180, duration=0.5)
-        animation.start(self)
-        screen_manager.current = 'screen1'
-
 class MainScreen(Screen):
     def __init__(self, **kwargs):
+        global lang_core
         super().__init__(**kwargs)
         self.add_widget(Image(source='background.png', allow_stretch=True, keep_ratio=False))
         button_grid = GridLayout(cols=1, size_hint=(0.3, 0.5), pos_hint={'right': 1, 'center_y': 0.5}, orientation='rl-bt')
         button1 = Button(text="Road Map")
         button1.bind(on_press=self.goto_screen2)
-        button2 = Button(text=text_map[selected_language]['bind_title'])
+        print(lang_core.selected_language)
+        button2 = Button(text=lang_core.get_text_from_map(title='bind_title'))
         button2.bind(on_press=self.goto_screen3)
-        button3 = Button(text=text_map[selected_language]['settings_title'])
+        button3 = Button(text=lang_core.get_text_from_map('settings_title'))
         button3.bind(on_press=self.goto_screen4)
-        button_grid.add_widget(Button(text=text_map[selected_language]['exit_title']
+        button_grid.add_widget(Button(text=lang_core.get_text_from_map('exit_title')
                                       , on_press=self.exit_app))
         button_grid.add_widget(button3)
         button_grid.add_widget(button2)
@@ -244,7 +192,7 @@ class RoadmapScreen(Screen):
                              pos_hint={'center_x':  0.2, 'center_y': 0.87}))
 
     def add_back_btn(self):
-        self.button = Button(text=text_map[selected_language]['mein_menu_title'],
+        self.button = Button(text=lang_core.get_text_from_map('mein_menu_title'),
                              size_hint=[1, .1],
                              pos_hint={'right': 1, 'top': 1})
         self.button.bind(on_press=self.goto_main)
@@ -256,10 +204,24 @@ class RoadmapScreen(Screen):
         screen_manager.current = 'screen1'
 
 screen_manager = ScreenManager()
+
+def screen_manager_rebuild():
+    global lang_core
+    screen_manager.clear_widgets()
+    screen_manager.add_widget(lang_core)
+    screen_manager.add_widget(MainScreen(name='screen1'))
+    screen_manager.add_widget(RoadmapScreen(name='screen2'))
+    screen_manager.add_widget(FlashCardScreen(name='screen3'))
+
+
+lang_core = LanguageScreen(screen_manager, name='screen4')
+screen_manager.add_widget(lang_core)
 screen_manager.add_widget(MainScreen(name='screen1'))
 screen_manager.add_widget(RoadmapScreen(name='screen2'))
 screen_manager.add_widget(FlashCardScreen(name='screen3'))
-screen_manager.add_widget(LanguageScreen(name='screen4'))
+screen_manager.current = 'screen1'
+
+screen_manager.rebuild = screen_manager_rebuild
 
 class MyApp(App):
     def build(self):
