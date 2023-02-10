@@ -7,9 +7,11 @@ from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
 from kivy.uix.label import Label
 from kivy.animation import Animation
+from kivy.properties import StringProperty
+from kivy.storage.jsonstore import JsonStore
+
 from language_screen import LanguageScreen, LanguageData
 from flash_card import FlashCardScreen
-
 
 Window.size = (400, 800)
 
@@ -77,17 +79,27 @@ class RoadmapScreen(Screen):
 
 screen_manager = ScreenManager()
 
-def screen_manager_rebuild():
-    global lang_data
+def screen_manager_rebuild(selected_language):
+    global lang_data, store
     screen_manager.clear_widgets()
+    lang_data.update_language(selected_language)
+    store.put('mykey', selected_language=selected_language)
     screen_manager.add_widget(LanguageScreen(lang_data, screen_manager, name='screen4'))
     screen_manager.add_widget(MainScreen(name='screen1'))
     screen_manager.add_widget(RoadmapScreen(name='screen2'))
     screen_manager.add_widget(FlashCardScreen(lang_data, screen_manager, name='screen3'))
 
+store = JsonStore('mystore.json')
+if 'mykey' in store:
+    print(store.get('mykey'))
+    selected_language = store.get('mykey')['selected_language']
+    print('Key exists')
+else:
+    store.put('mykey', selected_language='Русский')
+    selected_language = 'Русский'
 
 lang_data = LanguageData()
-print(lang_data.selected_language)
+lang_data.update_language(selected_language)
 
 screen_manager.add_widget(MainScreen(name='screen1'))
 screen_manager.add_widget(RoadmapScreen(name='screen2'))
@@ -97,8 +109,10 @@ screen_manager.current = 'screen1'
 
 screen_manager.rebuild = screen_manager_rebuild
 
+
 class MyApp(App):
     def build(self):
+
         return screen_manager
 
 if __name__ == '__main__':

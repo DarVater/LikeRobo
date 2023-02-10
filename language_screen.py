@@ -48,7 +48,7 @@ class LanguageScreen(Screen):
 
     def update_language(self):
         self.lang_data.selected_language = self.spinner.text
-        self.screen_manager.rebuild()
+        self.screen_manager.rebuild(self.spinner.text)
 
     def add_back_btn(self):
         self.button = Button(text=self.lang_data.get_text_from_map('mein_menu_title'),
