@@ -5,12 +5,10 @@ from kivy.uix.image import Image
 from kivy.uix.screenmanager import ScreenManager
 from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
-from kivy.uix.label import Label
-from kivy.animation import Animation
-from kivy.properties import StringProperty
 from kivy.storage.jsonstore import JsonStore
 
 from language_screen import LanguageScreen, LanguageData
+from roadmap_screen import RoadmapScreen
 from flash_card import FlashCardScreen
 
 Window.size = (400, 800)
@@ -47,36 +45,6 @@ class MainScreen(Screen):
     def exit_app(self, instance):
         App.get_running_app().stop()
 
-class RoadmapScreen(Screen):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.add_widget(Image(source='roadmap_background.png', allow_stretch=True, keep_ratio=False))
-        self.indicator_grid = GridLayout(rows=25, row_default_height=20, row_force_default=True,
-                                                size_hint=[0.2, .2],
-                                                pos_hint={'center_x':  0.9, 'center_y': 0.65})
-        for i in range(20):
-            self.indicator_grid.add_widget(Button(text='Indicator %d' % (i + 1),
-                                         size_hint=[0.1, .2], width = 30))
-            if (i+1) % 4 == 0:
-                self.indicator_grid.add_widget(Label(text=''))
-
-        self.add_widget(self.indicator_grid)
-        self.add_back_btn()
-        self.add_widget(Label(text='Roadmap', font_size='30sp',
-                             pos_hint={'center_x':  0.2, 'center_y': 0.87}))
-
-    def add_back_btn(self):
-        self.button = Button(text=lang_data.get_text_from_map('mein_menu_title'),
-                             size_hint=[1, .1],
-                             pos_hint={'right': 1, 'top': 1})
-        self.button.bind(on_press=self.goto_main)
-        self.add_widget(self.button)
-
-    def goto_main(self, instance):
-        animation = Animation(y=-180, duration=0.5)
-        animation.start(self)
-        screen_manager.current = 'screen1'
-
 screen_manager = ScreenManager()
 
 def screen_manager_rebuild(selected_language):
@@ -102,7 +70,7 @@ lang_data = LanguageData()
 lang_data.update_language(selected_language)
 
 screen_manager.add_widget(MainScreen(name='screen1'))
-screen_manager.add_widget(RoadmapScreen(name='screen2'))
+screen_manager.add_widget(RoadmapScreen(lang_data, screen_manager, name='screen2'))
 screen_manager.add_widget(FlashCardScreen(lang_data, screen_manager, name='screen3'))
 screen_manager.add_widget(LanguageScreen(lang_data, screen_manager, name='screen4'))
 screen_manager.current = 'screen1'
