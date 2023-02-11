@@ -9,7 +9,7 @@ from kivy.animation import Animation
 class RoadmapScreen(Screen):
     def __init__(self, lang_data, screen_manager, **kwargs):
         super().__init__(**kwargs)
-        self.add_widget(Image(source='roadmap_background.png', allow_stretch=True, keep_ratio=False))
+        self.add_widget(Image(source='imgs/roadmap_background.png', allow_stretch=True, keep_ratio=False))
         self.indicator_grid = GridLayout(rows=25, row_default_height=20, row_force_default=True,
                                                 size_hint=[0.2, .2],
                                                 pos_hint={'center_x':  0.9, 'center_y': 0.65})

@@ -18,7 +18,7 @@ class MainScreen(Screen):
     def __init__(self, **kwargs):
         global lang_data
         super().__init__(**kwargs)
-        self.add_widget(Image(source='background.png', allow_stretch=True, keep_ratio=False))
+        self.add_widget(Image(source='imgs/background.png', allow_stretch=True, keep_ratio=False))
         button_grid = GridLayout(cols=1, size_hint=(0.3, 0.5), pos_hint={'right': 1, 'center_y': 0.5}, orientation='rl-bt')
         button1 = Button(text="Road Map")
         button1.bind(on_press=self.goto_screen2)
@@ -54,7 +54,7 @@ def screen_manager_rebuild(selected_language):
     store.put('mykey', selected_language=selected_language)
     screen_manager.add_widget(LanguageScreen(lang_data, screen_manager, name='screen4'))
     screen_manager.add_widget(MainScreen(name='screen1'))
-    screen_manager.add_widget(RoadmapScreen(name='screen2'))
+    screen_manager.add_widget(RoadmapScreen(lang_data, screen_manager, name='screen2'))
     screen_manager.add_widget(FlashCardScreen(lang_data, screen_manager, name='screen3'))
 
 store = JsonStore('mystore.json')

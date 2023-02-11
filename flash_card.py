@@ -50,27 +50,29 @@ class FlashCard(FloatLayout, DragBehavior):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         card_pos = (200, 400)
-        self.front = Image(source='fleshcard.png', allow_stretch=True, keep_ratio=False, size_hint=(0.8, 0.8),
-                           pos_hint={'center_x': 0.9, 'center_y': 0.9})
-        self.back = Image(source='fleshcard.png', allow_stretch=True, keep_ratio=False, size_hint=(0.8, 0.8),
-                           pos_hint={'center_x': 0.9, 'center_y': 0.9})
-        self.front.add_widget(Label(text='Front of card', font_size='20sp', size_hint=(1, 1),
-                                    pos=[Window.size[0]/3, Window.size[1]/3.2]))
-        self.back.add_widget(Label(text='Back of card', font_size='20sp', size_hint=(1, 1),
-                                    pos=[Window.size[0]/3, Window.size[1]/3.2]))
+        self.front = self.create_new_card('fleshcard_new.png')
+        self.back = self.create_new_card('fleshcard_know.png')
+        self.fail = self.create_new_card('fleshcard_fail.png')
         self.add_widget(self.front)
         self.is_back_card = False
 
-        with self.front.canvas.before:
-            PushMatrix()
-            self.front.rot = Rotate()
-            self.front.rot.angle = 0
-            self.front.rot.origin = [Window.size[0]/2, Window.size[1]/2]
-            self.front.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
-            self.front.rot.axis = (0, 0, 1)
-        with self.front.canvas.after:
-            PopMatrix()
 
+    def create_new_card(self, src):
+        result_widget = Image(source='imgs/'+src, allow_stretch=True, keep_ratio=False, size_hint=(0.8, 0.8),
+                           pos_hint={'center_x': 0.9, 'center_y': 0.9})
+
+        result_widget.add_widget(Label(text='Я буду работающим? \n\n(продолжительное \nбудет длиться)', font_size='20sp', size_hint=(1, 1),
+                                    pos=[Window.size[0]/3, Window.size[1]/3.2]))
+        with result_widget.canvas.before:
+            PushMatrix()
+            result_widget.rot = Rotate()
+            result_widget.rot.angle = 0
+            result_widget.rot.origin = [Window.size[0]/2, Window.size[1]/2]
+            result_widget.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+            result_widget.rot.axis = (0, 0, 1)
+        with result_widget.canvas.after:
+            PopMatrix()
+        return result_widget
 
     def on_touch_down(self, touch):
         touch.touch_down_x = touch.x
@@ -94,17 +96,12 @@ class FlashCard(FloatLayout, DragBehavior):
                     animation = Animation(angle=-360, duration=0.1)
                     animation.bind(on_complete=self.change_card_side)
                     animation.start(self.front.rot)
-                    with self.back.canvas.before:
-                        PushMatrix()
-                        self.back.rot = Rotate()
-                        self.back.rot.angle = 0
-                        self.back.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
-                        self.back.rot.axis = (0, 0, 1)
-                    with self.back.canvas.after:
-                        PopMatrix()
                     self.is_back_card = True
 
             elif touch.x < touch.touch_down_x:
+
+                self.clear_widgets()
+                self.add_widget(self.fail)
                 # self.rot.angle -= 20
                 # Shift to the right
                 animation = Animation(x=-1*(self.parent.width + self.width), duration=0.1)
