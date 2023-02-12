@@ -10,9 +10,10 @@ from kivy.storage.jsonstore import JsonStore
 from language_screen import LanguageScreen, LanguageData
 from roadmap_screen import RoadmapScreen
 from flash_card import FlashCardScreen
+from mode_screen import ModeScreen
 
-Window.size = (400, 800)
-
+# Window.size = (400, 800)
+# add repid button to result screen
 
 class MainScreen(Screen):
     def __init__(self, **kwargs):
@@ -22,10 +23,13 @@ class MainScreen(Screen):
         button_grid = GridLayout(cols=1, size_hint=(0.3, 0.5), pos_hint={'right': 1, 'center_y': 0.5}, orientation='rl-bt')
         button1 = Button(text="Road Map")
         button1.bind(on_press=self.goto_screen2)
+
         button2 = Button(text=lang_data.get_text_from_map(title='bind_title'))
         button2.bind(on_press=self.goto_screen3)
+
         button3 = Button(text=lang_data.get_text_from_map('settings_title'))
         button3.bind(on_press=self.goto_screen4)
+
         button_grid.add_widget(Button(text=lang_data.get_text_from_map('exit_title')
                                       , on_press=self.exit_app))
         button_grid.add_widget(button3)
@@ -37,7 +41,7 @@ class MainScreen(Screen):
         screen_manager.current = 'screen2'
 
     def goto_screen3(self, instance):
-        screen_manager.current = 'screen3'
+        screen_manager.current = 'mode_screen'
 
     def goto_screen4(self, instance):
         screen_manager.current = 'screen4'
@@ -56,6 +60,7 @@ def screen_manager_rebuild(selected_language):
     screen_manager.add_widget(MainScreen(name='screen1'))
     screen_manager.add_widget(RoadmapScreen(lang_data, screen_manager, name='screen2'))
     screen_manager.add_widget(FlashCardScreen(lang_data, screen_manager, name='screen3'))
+    screen_manager.add_widget(ModeScreen(lang_data, screen_manager, name='mode_screen'))
 
 store = JsonStore('mystore.json')
 if 'mykey' in store:
@@ -73,6 +78,7 @@ screen_manager.add_widget(MainScreen(name='screen1'))
 screen_manager.add_widget(RoadmapScreen(lang_data, screen_manager, name='screen2'))
 screen_manager.add_widget(FlashCardScreen(lang_data, screen_manager, name='screen3'))
 screen_manager.add_widget(LanguageScreen(lang_data, screen_manager, name='screen4'))
+screen_manager.add_widget(ModeScreen(lang_data, screen_manager, name='mode_screen'))
 screen_manager.current = 'screen1'
 
 screen_manager.rebuild = screen_manager_rebuild
