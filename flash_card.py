@@ -20,7 +20,7 @@ class FlashCardScreen(Screen):
     temp_aim = ''
     round_sentences = []
     sentences_pair = {}
-    viewing_card = 'pass'
+    viewing_card = []
     failed_cards = []
     all_mistakes_count = 0
     start_time = time.time()
@@ -28,6 +28,9 @@ class FlashCardScreen(Screen):
 
     def __init__(self, lang_data, screen_manager, **kwargs):
         super().__init__(**kwargs)
+        self.round_sentences = [['front', 'back']]
+        self.deck_for_repeat = self.round_sentences.copy()
+        self.viewing_card = self.get_random_place()
         self.flash_card = FlashCard(self.viewing_card)
         self.add_widget(self.flash_card)
         self.screen_manager = screen_manager
@@ -40,6 +43,7 @@ class FlashCardScreen(Screen):
         self.temp_aim = aim
         self.sentences_pair = self.lang_data.get_sentences_pair()
         self.round_sentences = []
+        self.deck_for_repeat = self.round_sentences.copy()
         if 'i' in aim:
             self.chose_tense_type('Indefinite', aim)
         if 'c' in aim:
@@ -50,11 +54,25 @@ class FlashCardScreen(Screen):
             self.chose_tense_type('PerfectContinuous', aim)
         self.viewing_card = self.get_random_place()
         self.passed_cards = 0
+        self.all_mistakes_count = 0
         self.start_time = time.time()
         self.next_card()
 
     def card_was_failed(self):
         self.failed_cards.append(self.viewing_card)
+
+    def load_old_deck(self):
+        print('deck_for_repeat', self.deck_for_repeat)
+        self.round_sentences = self.deck_for_repeat.copy()
+        print('round_sentences', self.round_sentences)
+        self.viewing_card = self.get_random_place()
+        print('viewing_card', self.viewing_card)
+        self.clear_widgets()
+        self.flash_card = FlashCard(self.viewing_card)
+        self.add_widget(self.flash_card)
+        self.start_time = time.time()
+        self.passed_cards = 0
+        self.all_mistakes_count = 0
 
     def get_random_place(self):
         place = self.round_sentences[random.randint(0, len(self.round_sentences) - 1)]
@@ -101,8 +119,12 @@ class FlashCardScreen(Screen):
             self.failed_cards = []
             self.viewing_card = self.get_random_place()
         else:
-            pass_time = round(time.time() - self.start_time)
-            result_screen = ResultsCard(self.lang_data, self.screen_manager, self.all_mistakes_count, pass_time, self.passed_cards)
+            pass_time = round(time.time() - self.start_time, 1)
+            result_screen = ResultsCard(self.lang_data,
+                                        self.screen_manager,
+                                        self.all_mistakes_count,
+                                        pass_time,
+                                        self.passed_cards)
             self.clear_widgets()
             self.add_widget(result_screen)
 
@@ -195,25 +217,61 @@ class ResultsCard(Screen):
         super().__init__(**kwargs)
         self.screen_manager = screen_manager
         self.lang_data = lang_data
-        self.result_grid = GridLayout(rows=25, size=Window.size, size_hint=(.8, .5),
-                                         pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        result_widget = Image(source='imgs/background_result.png', allow_stretch=True, keep_ratio=False, size_hint=(1, 1),
+                           pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        self.add_widget(result_widget)
+        self.result_grid = GridLayout(rows=25, size=Window.size, size_hint=(.5, .170),
+                                         pos_hint={'center_x': 0.56, 'center_y': 0.305})
         self.add_widget(self.result_grid)
-        self.mistakes = Label(text=str(mistakes), font_size='20sp')
+        self.passed_cards = Label(text=str(passed_cards), font_size='15sp')
+        self.result_grid.add_widget(self.passed_cards)
+        self.mistakes = Label(text=str(mistakes), font_size='15sp')
         self.result_grid.add_widget(self.mistakes)
-        self.pass_time = Label(text=str(pass_time), font_size='20sp')
-        self.result_grid.add_widget(self.pass_time)
-        self.passed_cards = Label(text=str(passed_cards), font_size='20sp')
+        self.round_result = round(pass_time / (passed_cards - mistakes), 1)
+        if self.round_result < 3:
+            self.time_color = (115, 43, 93)
+            self.continue_btn()
+        else:
+            self.time_color = (10, 84, 89)
+            self.repeat_btn()
+        self.passed_cards = Label(text=str(self.round_result), color=self.time_color, font_size='15sp')
         self.result_grid.add_widget(self.passed_cards)
         self.add_back_btn()
 
+    def continue_btn(self):
+        self.continue_button = Button(size_hint=[.42, .055],
+                                      background_normal='imgs/continue_normal.png',
+                                      background_down='imgs/continue_down.png',
+                                      pos_hint={'center_x': 0.50, 'top': 0.185})
+        self.continue_button.bind(on_press=self.continue_road_map)
+        self.add_widget(self.continue_button)
+
+    def repeat_btn(self):
+        self.continue_button = Button(size_hint=[.42, .055],
+                                      background_normal='imgs/repeat_normal.png',
+                                      background_down='imgs/repeat_down.png',
+                                      pos_hint={'center_x': 0.50, 'top': 0.185})
+        self.continue_button.bind(on_press=self.repeat_deck)
+
+        self.add_widget(self.continue_button)
+
     def add_back_btn(self):
-        self.button = Button(text=self.lang_data.get_text_from_map('mein_menu_title'),
-                             size_hint=[1, .1],
-                             pos_hint={'right': 1, 'top': 1})
+        self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.90, 'top': 0.95})
         self.button.bind(on_press=self.goto_main)
         self.add_widget(self.button)
 
-    def goto_main(self, instance=''):
+    def goto_main(self, instance):
         animation = Animation(y=-180, duration=0.5)
         animation.start(self)
         self.screen_manager.current = 'screen1'
+
+    def repeat_deck(self, instance):
+        animation = Animation(y=-180, duration=0.5)
+        animation.start(self)
+        self.parent.load_old_deck()
+
+    def continue_road_map(self, instance):
+        animation = Animation(y=-180, duration=0.5)
+        animation.start(self)
+        self.screen_manager.current = 'screen2'
+

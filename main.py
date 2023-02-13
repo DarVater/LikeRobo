@@ -12,7 +12,7 @@ from roadmap_screen import RoadmapScreen
 from flash_card import FlashCardScreen
 from mode_screen import ModeScreen
 
-# Window.size = (400, 800)
+Window.size = (400, 800)
 # add repid button to result screen
 
 class MainScreen(Screen):
@@ -79,7 +79,7 @@ screen_manager.add_widget(RoadmapScreen(lang_data, screen_manager, name='screen2
 screen_manager.add_widget(FlashCardScreen(lang_data, screen_manager, name='screen3'))
 screen_manager.add_widget(LanguageScreen(lang_data, screen_manager, name='screen4'))
 screen_manager.add_widget(ModeScreen(lang_data, screen_manager, name='mode_screen'))
-screen_manager.current = 'screen1'
+screen_manager.current = 'screen3'
 
 screen_manager.rebuild = screen_manager_rebuild
 
