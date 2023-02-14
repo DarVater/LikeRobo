@@ -78,7 +78,8 @@ class ModeScreen(Screen):
 
 
     def add_back_btn(self):
-        self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.99, 'top': 0.99})
+        self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.99, 'top': 0.99},
+                                  border=(0, 0, 0, 0),)
         self.button.bind(on_press=self.goto_main)
         self.add_widget(self.button)
 
@@ -130,5 +131,6 @@ class ModeScreen(Screen):
                 ans += 'PT'
         animation = Animation(y=-180, duration=0.5)
         animation.start(self)
+        self.screen_manager.get_screen('screen2').wait_progress = False
         self.screen_manager.get_screen('screen3').choose_a_deck(ans)
         self.screen_manager.current = 'screen3'

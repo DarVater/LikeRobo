@@ -1,5 +1,6 @@
 from kivy.uix.button import Button
 from kivy.lang import Builder
+from kivy.core.window import Window
 
 kv = """
 <BackButton@Button>:
@@ -32,3 +33,12 @@ class StartButton(Button):
     pass
 
 Builder.load_string(kv)
+
+
+def get_media_lvl():
+    media_lvl = 'M1'
+    if Window.size[1] > 1500:
+        if Window.size[0] < 1500:
+            media_lvl = 'M2'
+    print('media_lvl', media_lvl)
+    return media_lvl

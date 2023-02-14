@@ -12,7 +12,7 @@ from roadmap_screen import RoadmapScreen
 from flash_card import FlashCardScreen
 from mode_screen import ModeScreen
 
-Window.size = (400, 800)
+Window.size = (500, 1000)
 # add repid button to result screen
 
 class MainScreen(Screen):
@@ -55,7 +55,10 @@ def screen_manager_rebuild(selected_language):
     global lang_data, store
     screen_manager.clear_widgets()
     lang_data.update_language(selected_language)
-    store.put('mykey', selected_language=selected_language)
+    store.put('app_data', selected_language=selected_language, road_map=app_data['road_map'])
+    create_widget_screens()
+
+def create_widget_screens():
     screen_manager.add_widget(LanguageScreen(lang_data, screen_manager, name='screen4'))
     screen_manager.add_widget(MainScreen(name='screen1'))
     screen_manager.add_widget(RoadmapScreen(lang_data, screen_manager, name='screen2'))
@@ -63,23 +66,17 @@ def screen_manager_rebuild(selected_language):
     screen_manager.add_widget(ModeScreen(lang_data, screen_manager, name='mode_screen'))
 
 store = JsonStore('mystore.json')
-if 'mykey' in store:
-    print(store.get('mykey'))
-    selected_language = store.get('mykey')['selected_language']
-    print('Key exists')
+if 'app_data' in store:
+    app_data = store.get('app_data')
+    selected_language = app_data['selected_language']
 else:
-    store.put('mykey', selected_language='Русский')
+    store.put('app_data', selected_language='Русский', road_map={})
     selected_language = 'Русский'
 
 lang_data = LanguageData()
 lang_data.update_language(selected_language)
-
-screen_manager.add_widget(MainScreen(name='screen1'))
-screen_manager.add_widget(RoadmapScreen(lang_data, screen_manager, name='screen2'))
-screen_manager.add_widget(FlashCardScreen(lang_data, screen_manager, name='screen3'))
-screen_manager.add_widget(LanguageScreen(lang_data, screen_manager, name='screen4'))
-screen_manager.add_widget(ModeScreen(lang_data, screen_manager, name='mode_screen'))
-screen_manager.current = 'screen3'
+create_widget_screens()
+screen_manager.current = 'screen1'
 
 screen_manager.rebuild = screen_manager_rebuild
 

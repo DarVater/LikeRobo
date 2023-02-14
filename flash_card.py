@@ -13,7 +13,7 @@ from kivy.graphics import Rotate
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import Screen
 
-from sistem import BackButton
+from sistem import BackButton, get_media_lvl
 
 
 class FlashCardScreen(Screen):
@@ -43,7 +43,12 @@ class FlashCardScreen(Screen):
         self.temp_aim = aim
         self.sentences_pair = self.lang_data.get_sentences_pair()
         self.round_sentences = []
-        self.deck_for_repeat = self.round_sentences.copy()
+        if 'FT' not in aim and 'NT' not in aim and 'PT' not in aim:
+            aim += 'FTNTPT'
+        if '+' not in aim and '-' not in aim and '?' not in aim:
+            aim += '+-?'
+        if 'i' not in aim and 'c' not in aim and 'p' not in aim and 'PC' not in aim:
+            aim += 'icpPC'
         if 'i' in aim:
             self.chose_tense_type('Indefinite', aim)
         if 'c' in aim:
@@ -52,6 +57,7 @@ class FlashCardScreen(Screen):
             self.chose_tense_type('Perfect', aim)
         if 'PC' in aim:
             self.chose_tense_type('PerfectContinuous', aim)
+        self.deck_for_repeat = self.round_sentences.copy()
         self.viewing_card = self.get_random_place()
         self.passed_cards = 0
         self.all_mistakes_count = 0
@@ -62,11 +68,8 @@ class FlashCardScreen(Screen):
         self.failed_cards.append(self.viewing_card)
 
     def load_old_deck(self):
-        print('deck_for_repeat', self.deck_for_repeat)
         self.round_sentences = self.deck_for_repeat.copy()
-        print('round_sentences', self.round_sentences)
         self.viewing_card = self.get_random_place()
-        print('viewing_card', self.viewing_card)
         self.clear_widgets()
         self.flash_card = FlashCard(self.viewing_card)
         self.add_widget(self.flash_card)
@@ -142,7 +145,6 @@ class FlashCard(FloatLayout, DragBehavior):
     def __init__(self, viewing_card,  **kwargs):
         super().__init__(**kwargs)
         self.viewing_card = viewing_card
-        card_pos = (200, 400)
         self.front = self.create_new_card('fleshcard_new.png', viewing_card[0])
         self.back = self.create_new_card('fleshcard_know.png', viewing_card[1])
         self.fail = self.create_new_card('fleshcard_fail.png', '')
@@ -228,9 +230,10 @@ class ResultsCard(Screen):
         self.mistakes = Label(text=str(mistakes), font_size='15sp')
         self.result_grid.add_widget(self.mistakes)
         self.round_result = round(pass_time / (passed_cards - mistakes), 1)
-        if self.round_result < 3:
+        if self.round_result < 3:##############################################################################
             self.time_color = (115, 43, 93)
             self.continue_btn()
+            self.screen_manager.get_screen('screen2').save_progress()
         else:
             self.time_color = (10, 84, 89)
             self.repeat_btn()
@@ -239,7 +242,8 @@ class ResultsCard(Screen):
         self.add_back_btn()
 
     def continue_btn(self):
-        self.continue_button = Button(size_hint=[.42, .055],
+
+        self.continue_button = Button(size_hint=[.42, .055], border=(0, 0, 0, 0),
                                       background_normal='imgs/continue_normal.png',
                                       background_down='imgs/continue_down.png',
                                       pos_hint={'center_x': 0.50, 'top': 0.185})
@@ -247,7 +251,7 @@ class ResultsCard(Screen):
         self.add_widget(self.continue_button)
 
     def repeat_btn(self):
-        self.continue_button = Button(size_hint=[.42, .055],
+        self.continue_button = Button(size_hint=[.42, .055], border=(0, 0, 0, 0),
                                       background_normal='imgs/repeat_normal.png',
                                       background_down='imgs/repeat_down.png',
                                       pos_hint={'center_x': 0.50, 'top': 0.185})
@@ -256,7 +260,8 @@ class ResultsCard(Screen):
         self.add_widget(self.continue_button)
 
     def add_back_btn(self):
-        self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.90, 'top': 0.95})
+        self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.90, 'top': 0.95},
+                                  border=(0, 0, 0, 0),)
         self.button.bind(on_press=self.goto_main)
         self.add_widget(self.button)
 
