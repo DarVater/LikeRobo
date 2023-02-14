@@ -28,7 +28,8 @@ class FlashCardScreen(Screen):
 
     def __init__(self, lang_data, screen_manager, **kwargs):
         super().__init__(**kwargs)
-        self.round_sentences = [['front', 'back']]
+        self.round_sentences = [['Они не будут работающими  (продолжительное не будет длиться)',
+                                 'hey won\'t have been working']]
         self.deck_for_repeat = self.round_sentences.copy()
         self.viewing_card = self.get_random_place()
         self.flash_card = FlashCard(self.viewing_card)
@@ -145,19 +146,37 @@ class FlashCard(FloatLayout, DragBehavior):
     def __init__(self, viewing_card,  **kwargs):
         super().__init__(**kwargs)
         self.viewing_card = viewing_card
-        self.front = self.create_new_card('fleshcard_new.png', viewing_card[0])
-        self.back = self.create_new_card('fleshcard_know.png', viewing_card[1])
+
+        self.front = self.create_new_card('fleshcard_new.png', self.adapt_text(viewing_card[0], 20))
+        self.back = self.create_new_card('fleshcard_know.png', self.adapt_text(viewing_card[1], 20))
         self.fail = self.create_new_card('fleshcard_fail.png', '')
         self.add_widget(self.front)
         self.is_back_card = False
 
+    def adapt_text(self, text, max_sing):
+        new_text = ''
+        sing_pass = 0
+
+        for row in text.split('('):
+            if len(new_text) != 0:
+                new_text += '\n('
+            for word in row.split(' '):
+                sing_pass += len(word)
+                if max_sing < sing_pass:
+                    sing_pass = 0
+                    new_text += '\n'
+                new_text += ' ' + word
+                print(new_text)
+        if '(\n ' in new_text:
+            new_text = new_text.replace('(\n ', '(')
+        return new_text
 
     def create_new_card(self, src, text):
         result_widget = Image(source='imgs/'+src, allow_stretch=True, keep_ratio=False, size_hint=(0.8, 0.8),
                            pos_hint={'center_x': 0.9, 'center_y': 0.9})
 
         result_widget.add_widget(Label(text=text, font_size='20sp', size_hint=(1, 1),
-                                    pos=[Window.size[0]/3, Window.size[1]/3.2]))
+                                    pos=[Window.size[0]/2.5, Window.size[1]/3]))
         with result_widget.canvas.before:
             PushMatrix()
             result_widget.rot = Rotate()
@@ -230,7 +249,7 @@ class ResultsCard(Screen):
         self.mistakes = Label(text=str(mistakes), font_size='15sp')
         self.result_grid.add_widget(self.mistakes)
         self.round_result = round(pass_time / (passed_cards - mistakes), 1)
-        if self.round_result < 3:##############################################################################
+        if self.round_result < 3:
             self.time_color = (115, 43, 93)
             self.continue_btn()
             self.screen_manager.get_screen('screen2').save_progress()

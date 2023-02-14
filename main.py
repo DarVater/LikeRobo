@@ -76,7 +76,7 @@ else:
 lang_data = LanguageData()
 lang_data.update_language(selected_language)
 create_widget_screens()
-screen_manager.current = 'screen1'
+screen_manager.current = 'screen3'
 
 screen_manager.rebuild = screen_manager_rebuild
 
