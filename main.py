@@ -2,6 +2,7 @@ from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
+from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager
 from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
@@ -19,23 +20,20 @@ class MainScreen(Screen):
     def __init__(self, **kwargs):
         global lang_data
         super().__init__(**kwargs)
-        self.add_widget(Image(source='imgs/background.png', allow_stretch=True, keep_ratio=False))
-        button_grid = GridLayout(cols=1, size_hint=(0.3, 0.5), pos_hint={'right': 1, 'center_y': 0.5}, orientation='rl-bt')
-        button1 = Button(text="Road Map")
-        button1.bind(on_press=self.goto_screen2)
+        self.add_widget(Image(source='imgs/background_main.png', allow_stretch=True, keep_ratio=False))
+        self.button_grid = GridLayout(cols=1, size_hint=(0.35, 0.23), pos_hint={'center_x': 0.5, 'center_y': 0.16}, orientation='rl-bt')
+        self.add_button_to_screen(lang_data.get_text_from_map(title='exit_title'), self.exit_app)
+        self.add_button_to_screen(lang_data.get_text_from_map(title='settings_title'), self.goto_screen4)
+        self.add_button_to_screen(lang_data.get_text_from_map(title='bind_title'), self.goto_screen3)
+        self.add_button_to_screen("Road Map", self.goto_screen2)
+        self.add_widget(self.button_grid)
 
-        button2 = Button(text=lang_data.get_text_from_map(title='bind_title'))
-        button2.bind(on_press=self.goto_screen3)
-
-        button3 = Button(text=lang_data.get_text_from_map('settings_title'))
-        button3.bind(on_press=self.goto_screen4)
-
-        button_grid.add_widget(Button(text=lang_data.get_text_from_map('exit_title')
-                                      , on_press=self.exit_app))
-        button_grid.add_widget(button3)
-        button_grid.add_widget(button2)
-        button_grid.add_widget(button1)
-        self.add_widget(button_grid)
+    def add_button_to_screen(self, title, foo):
+        button2 = Button(border=(0, 0, 0, 0), text='[color=000]'+title+'[/color]', font_size='17sp',
+                                      background_normal='imgs/main_button_normal.png', markup=True,
+                                      background_down='imgs/main_button_down.png',)
+        button2.bind(on_press=foo)
+        self.button_grid.add_widget(button2)
 
     def goto_screen2(self, instance):
         screen_manager.current = 'screen2'
@@ -76,7 +74,7 @@ else:
 lang_data = LanguageData()
 lang_data.update_language(selected_language)
 create_widget_screens()
-screen_manager.current = 'screen3'
+screen_manager.current = 'screen1'
 
 screen_manager.rebuild = screen_manager_rebuild
 

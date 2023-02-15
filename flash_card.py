@@ -166,7 +166,6 @@ class FlashCard(FloatLayout, DragBehavior):
                     sing_pass = 0
                     new_text += '\n'
                 new_text += ' ' + word
-                print(new_text)
         if '(\n ' in new_text:
             new_text = new_text.replace('(\n ', '(')
         return new_text
