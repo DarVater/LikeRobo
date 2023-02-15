@@ -29,7 +29,7 @@ class ModeScreen(Screen):
         self.screen_manager = screen_manager
         self.lang_data = lang_data
         self.mode_grid = GridLayout(rows=25, size=Window.size, size_hint=(.8, .8),
-                                         pos_hint={'center_x': 0.5, 'center_y': 0.5})
+                                         pos_hint={'center_x': 0.5, 'center_y': 0.485})
 
         self.add_widget(Image(source='imgs/background_mode.png', allow_stretch=True, keep_ratio=False))
         self.add_back_btn()
@@ -149,5 +149,5 @@ class ModeScreen(Screen):
         animation = Animation(y=-180, duration=0.5)
         animation.start(self)
         self.screen_manager.get_screen('screen2').wait_progress = False
-        self.screen_manager.get_screen('screen3').choose_a_deck(ans)
+        self.screen_manager.get_screen('screen3').ids['fcs'].choose_a_deck(ans)
         self.screen_manager.current = 'screen3'

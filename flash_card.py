@@ -15,6 +15,27 @@ from kivy.uix.screenmanager import Screen
 
 from sistem import BackButton, get_media_lvl
 
+class FlashWrapperScreen(Screen):
+    def __init__(self, lang_data, screen_manager, **kwargs):
+        super().__init__(**kwargs)
+        self.add_widget(Image(source='imgs/background_mode.png', allow_stretch=True, keep_ratio=False))
+        self.screen_manager = screen_manager
+        self.lang_data = lang_data
+        self.fcs = FlashCardScreen(lang_data, screen_manager, name='screen3')
+        self.add_widget(self.fcs)
+        self.ids['fcs'] = self.fcs
+        self.add_back_btn()
+
+    def add_back_btn(self):
+        self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.99, 'top': 0.99},
+                                  border=(0, 0, 0, 0),)
+        self.button.bind(on_press=self.goto_main)
+        self.add_widget(self.button)
+
+    def goto_main(self, instance):
+        animation = Animation(y=-180, duration=0.5)
+        animation.start(self)
+        self.screen_manager.current = 'screen1'
 
 class FlashCardScreen(Screen):
     temp_aim = ''
@@ -32,13 +53,12 @@ class FlashCardScreen(Screen):
                                  'hey won\'t have been working']]
         self.deck_for_repeat = self.round_sentences.copy()
         self.viewing_card = self.get_random_place()
-        self.flash_card = FlashCard(self.viewing_card)
+        self.flash_card = FlashCard(self.viewing_card, self.get_left_cards())
         self.add_widget(self.flash_card)
         self.screen_manager = screen_manager
         self.lang_data = lang_data
         self.x = 0
         self.y = 0
-        self.add_back_btn()
 
     def choose_a_deck(self, aim):
         self.temp_aim = aim
@@ -72,7 +92,7 @@ class FlashCardScreen(Screen):
         self.round_sentences = self.deck_for_repeat.copy()
         self.viewing_card = self.get_random_place()
         self.clear_widgets()
-        self.flash_card = FlashCard(self.viewing_card)
+        self.flash_card = FlashCard(self.viewing_card, self.get_left_cards())
         self.add_widget(self.flash_card)
         self.start_time = time.time()
         self.passed_cards = 0
@@ -104,14 +124,16 @@ class FlashCardScreen(Screen):
             for s in some_sentences_pair['?']:
                 self.round_sentences.append(s)
 
+    def get_left_cards(self):
+        return str(len(self.round_sentences)+len(self.failed_cards)+1)
+
     def next_card(self, animation='', rotate=''):
         self.passed_cards += 1
         self.x = 0
         self.y = self.width * 2
         self.clear_widgets()
-        self.flash_card = FlashCard(self.viewing_card)
+        self.flash_card = FlashCard(self.viewing_card, self.get_left_cards())
         self.add_widget(self.flash_card)
-        self.add_back_btn()
         animation = Animation(y=0, duration=0.1)
         animation.start(self)
         if len(self.round_sentences) > 0:
@@ -131,27 +153,24 @@ class FlashCardScreen(Screen):
                                         self.passed_cards)
             self.clear_widgets()
             self.add_widget(result_screen)
-
-    def add_back_btn(self):
-        self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.99, 'top': 0.99})
-        self.button.bind(on_press=self.goto_main)
-        self.add_widget(self.button)
-
-    def goto_main(self, instance):
-        animation = Animation(y=-180, duration=0.5)
-        animation.start(self)
-        self.screen_manager.current = 'screen1'
 class FlashCard(FloatLayout, DragBehavior):
 
-    def __init__(self, viewing_card,  **kwargs):
+    def __init__(self, viewing_card, left, **kwargs):
         super().__init__(**kwargs)
         self.viewing_card = viewing_card
-
+        self.left = left
         self.front = self.create_new_card('fleshcard_new.png', self.adapt_text(viewing_card[0], 15))
         self.back = self.create_new_card('fleshcard_know.png', self.adapt_text(viewing_card[1], 15))
         self.fail = self.create_new_card('fleshcard_fail.png', '')
         self.add_widget(self.front)
         self.is_back_card = False
+
+    def write_count_cards(self):
+        return(Label(text=self.left,
+                                color='c0deff',
+                                bold=True,
+                                font_size='24sp', size_hint=(1, 1),
+                                pos_hint={'center_x': 0.80, 'center_y': 0.43}))
 
     def adapt_text(self, text, max_sing):
         new_text = ''
@@ -176,12 +195,14 @@ class FlashCard(FloatLayout, DragBehavior):
 
         result_widget.add_widget(Label(text=text, font_size='20sp', size_hint=(1, 1),
                                     pos=[Window.size[0]/2.5, Window.size[1]/3]))
+        result_widget.add_widget(Label(text=self.left, font_size='20sp', size_hint=(1, 1),
+                                    pos=[Window.size[0]/7, Window.size[1]/2.6]))
         with result_widget.canvas.before:
             PushMatrix()
             result_widget.rot = Rotate()
             result_widget.rot.angle = 0
             result_widget.rot.origin = [Window.size[0]/2, Window.size[1]/2]
-            result_widget.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+            result_widget.pos_hint = {'center_x': 0.5, 'center_y': 0.45}
             result_widget.rot.axis = (0, 0, 1)
         with result_widget.canvas.after:
             PopMatrix()
@@ -277,24 +298,24 @@ class ResultsCard(Screen):
 
         self.add_widget(self.continue_button)
 
-    def add_back_btn(self):
-        self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.90, 'top': 0.95},
-                                  border=(0, 0, 0, 0),)
-        self.button.bind(on_press=self.goto_main)
-        self.add_widget(self.button)
-
-    def goto_main(self, instance):
-        animation = Animation(y=-180, duration=0.5)
-        animation.start(self)
-        self.screen_manager.current = 'screen1'
 
     def repeat_deck(self, instance):
         animation = Animation(y=-180, duration=0.5)
         animation.start(self)
         self.parent.load_old_deck()
 
+    def add_back_btn(self):
+        self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.99, 'top': 0.99})
+        self.button.bind(on_press=self.goto_main)
+        self.add_widget(self.button)
+
     def continue_road_map(self, instance):
         animation = Animation(y=-180, duration=0.5)
         animation.start(self)
         self.screen_manager.current = 'screen2'
+
+    def goto_main(self, instance):
+        animation = Animation(y=-180, duration=0.5)
+        animation.start(self)
+        self.screen_manager.current = 'screen1'
 

@@ -131,5 +131,5 @@ class RoadmapScreen(Screen):
         animation = Animation(y=-180, duration=0.5)
         animation.start(self)
         self.wait_progress = True
-        self.screen_manager.get_screen('screen3').choose_a_deck(self.aim)
+        self.screen_manager.get_screen('screen3').ids['fcs'].choose_a_deck(self.aim)
         self.screen_manager.current = 'screen3'
