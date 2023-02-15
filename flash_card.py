@@ -147,8 +147,8 @@ class FlashCard(FloatLayout, DragBehavior):
         super().__init__(**kwargs)
         self.viewing_card = viewing_card
 
-        self.front = self.create_new_card('fleshcard_new.png', self.adapt_text(viewing_card[0], 20))
-        self.back = self.create_new_card('fleshcard_know.png', self.adapt_text(viewing_card[1], 20))
+        self.front = self.create_new_card('fleshcard_new.png', self.adapt_text(viewing_card[0], 15))
+        self.back = self.create_new_card('fleshcard_know.png', self.adapt_text(viewing_card[1], 15))
         self.fail = self.create_new_card('fleshcard_fail.png', '')
         self.add_widget(self.front)
         self.is_back_card = False

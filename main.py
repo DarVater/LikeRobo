@@ -12,6 +12,9 @@ from language_screen import LanguageScreen, LanguageData
 from roadmap_screen import RoadmapScreen
 from flash_card import FlashCardScreen
 from mode_screen import ModeScreen
+from kivy.config import Config
+
+Config.set('kivy','window_icon','imgs/icon.png')
 
 Window.size = (500, 1000)
 # add repid button to result screen
@@ -81,7 +84,8 @@ screen_manager.rebuild = screen_manager_rebuild
 
 class MyApp(App):
     def build(self):
-
+        self.icon = 'imgs/icon.png'
+        self.loaded = 'imgs/background_main.png'
         return screen_manager
 
 if __name__ == '__main__':
