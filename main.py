@@ -1,8 +1,8 @@
+from kivmob import KivMob, TestIds
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
-from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager
 from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
@@ -16,7 +16,7 @@ from kivy.config import Config
 
 Config.set('kivy','window_icon','imgs/icon.png')
 
-# Window.size = (500, 1000)
+Window.size = (500, 1000)
 # add repid button to result screen
 
 class MainScreen(Screen):
@@ -85,6 +85,12 @@ screen_manager.rebuild = screen_manager_rebuild
 
 class MyApp(App):
     def build(self):
+        APP = 'ca-app-pub-9906169229834445~1570037277'
+        BANNER = 'ca-app-pub-9906169229834445/6439220570'
+        self.ads = KivMob(TestIds.APP)
+        self.ads.new_banner(TestIds.BANNER)
+        self.ads.request_banner()
+        self.ads.show_banner()
         self.icon = 'imgs/icon.png'
         self.loaded = 'imgs/background_main.png'
         return screen_manager

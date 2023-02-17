@@ -159,8 +159,8 @@ class FlashCard(FloatLayout, DragBehavior):
         super().__init__(**kwargs)
         self.viewing_card = viewing_card
         self.left = left
-        self.front = self.create_new_card('fleshcard_new.png', self.adapt_text(viewing_card[0], 15))
-        self.back = self.create_new_card('fleshcard_know.png', self.adapt_text(viewing_card[1], 15))
+        self.front = self.create_new_card('fleshcard_new.png', self.adapt_text(viewing_card[0], 20))
+        self.back = self.create_new_card('fleshcard_know.png', self.adapt_text(viewing_card[1], 20))
         self.fail = self.create_new_card('fleshcard_fail.png', '')
         self.add_widget(self.front)
         self.is_back_card = False
@@ -176,17 +176,19 @@ class FlashCard(FloatLayout, DragBehavior):
         new_text = ''
         sing_pass = 0
 
-        for row in text.split('('):
-            if len(new_text) != 0:
-                new_text += '\n('
-            for word in row.split(' '):
-                sing_pass += len(word)
-                if max_sing < sing_pass:
-                    sing_pass = 0
-                    new_text += '\n'
-                new_text += ' ' + word
-        if '(\n ' in new_text:
-            new_text = new_text.replace('(\n ', '(')
+        for word in text.split(' '):
+            print('word', word)
+            print('max_sing', max_sing)
+            print('sing_pass', sing_pass)
+            print('len(word)', len(word))
+            print('max_sing < sing_pass + len(word) =', max_sing < sing_pass + len(word))
+            if sing_pass + len(word) > max_sing:
+                new_text += '\n'
+                sing_pass = 0
+            new_text += ' ' + word
+            sing_pass += len(word)
+            print('new_text', new_text)
+        print(111111111111111111111)
         return new_text
 
     def create_new_card(self, src, text):
