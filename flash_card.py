@@ -177,18 +177,11 @@ class FlashCard(FloatLayout, DragBehavior):
         sing_pass = 0
 
         for word in text.split(' '):
-            print('word', word)
-            print('max_sing', max_sing)
-            print('sing_pass', sing_pass)
-            print('len(word)', len(word))
-            print('max_sing < sing_pass + len(word) =', max_sing < sing_pass + len(word))
             if sing_pass + len(word) > max_sing:
                 new_text += '\n'
                 sing_pass = 0
             new_text += ' ' + word
             sing_pass += len(word)
-            print('new_text', new_text)
-        print(111111111111111111111)
         return new_text
 
     def create_new_card(self, src, text):
