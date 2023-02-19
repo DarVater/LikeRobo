@@ -1,4 +1,4 @@
-from kivmob import KivMob, TestIds
+from kivmob import KivMob, TestIds, RewardedListenerInterface
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
@@ -7,6 +7,7 @@ from kivy.uix.screenmanager import ScreenManager
 from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
 from kivy.storage.jsonstore import JsonStore
+from kivy.utils import platform
 
 from language_screen import LanguageScreen, LanguageData
 from roadmap_screen import RoadmapScreen
@@ -16,7 +17,8 @@ from kivy.config import Config
 
 Config.set('kivy','window_icon','imgs/icon.png')
 
-Window.size = (500, 1000)
+if platform != "android":
+    Window.size = (500, 1000)
 # add repid button to result screen
 
 class MainScreen(Screen):
@@ -81,19 +83,50 @@ create_widget_screens()
 screen_manager.current = 'screen1'
 
 screen_manager.rebuild = screen_manager_rebuild
+if platform != "android":
+    screen_manager.ads = None
 
 
 class MyApp(App):
     def build(self):
-        APP = 'ca-app-pub-9906169229834445~1570037277'
-        BANNER = 'ca-app-pub-9906169229834445/6439220570'
-        self.ads = KivMob(TestIds.APP)
-        self.ads.new_banner(TestIds.BANNER)
-        self.ads.request_banner()
-        self.ads.show_banner()
+        if platform != "android":
+            APP = 'ca-app-pub-9906169229834445~1570037277'
+            BANNER = 'ca-app-pub-9906169229834445/6439220570'
+            screen_manager.ads = KivMob(TestIds.APP)
+            # self.ads.new_banner(TestIds.BANNER)
+            # self.ads.request_banner()
+            # self.ads.show_banner()
+            screen_manager.ads.load_rewarded_ad(TestIds.REWARDED_VIDEO)
+            screen_manager.ads.set_rewarded_ad_listener(RewardedListenerInterface())
         self.icon = 'imgs/icon.png'
         self.loaded = 'imgs/background_main.png'
         return screen_manager
 
+    def on_resume(self):
+        if platform != "android":
+            self.ads.load_rewarded_ad(TestIds.REWARDED_VIDEO)
+
 if __name__ == '__main__':
     MyApp().run()
+# from kivmob import KivMob, TestIds, RewardedListenerInterface
+#
+# from kivy.app import App
+# from kivy.uix.button import Button
+#
+# class RewardedVideoTest(App):
+#     """ Display a rewarded video ad on button release.
+#     """
+#
+#     def build(self):
+#         self.ads = KivMob(TestIds.APP)
+#         self.ads.load_rewarded_ad(TestIds.REWARDED_VIDEO)
+#         # Add any callback functionality to this class.
+#         self.ads.set_rewarded_ad_listener(RewardedListenerInterface())
+#         return Button(text='Show Rewarded Ad',
+#                       on_release=lambda a:self.ads.show_rewarded_ad())
+#
+#     def on_resume(self):
+#         self.ads.load_rewarded_ad(TestIds.REWARDED_VIDEO)
+#
+# if __name__ == "__main__":
+#     RewardedVideoTest().run()

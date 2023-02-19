@@ -222,9 +222,9 @@ class FlashCard(FloatLayout, DragBehavior):
                     animation.start(self.parent)
                 else:
                     # Shift to the left
-                    animation = Animation(angle=-360, duration=0.1)
+                    animation = Animation(size_hint=(0, 0.8), duration=0.1)
                     animation.bind(on_complete=self.change_card_side)
-                    animation.start(self.front.rot)
+                    animation.start(self.front)
                     self.is_back_card = True
 
             elif touch.x < touch.touch_down_x:
@@ -307,6 +307,12 @@ class ResultsCard(Screen):
     def continue_road_map(self, instance):
         animation = Animation(y=-180, duration=0.5)
         animation.start(self)
+        self.screen_manager.ads.show_rewarded_ad()
+        from kivmob import TestIds
+        from kivy.utils import platform
+        if platform != "android":
+            self.screen_manager.ads.load_rewarded_ad(TestIds.REWARDED_VIDEO)
+            self.screen_manager.ads.load_rewarded_ad(TestIds.REWARDED_VIDEO)
         self.screen_manager.current = 'screen2'
 
     def goto_main(self, instance):
