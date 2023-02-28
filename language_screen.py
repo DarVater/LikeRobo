@@ -772,10 +772,13 @@ class LanguageScreen(Screen):
             size_hint=(0.5, 0.1),
             color=[0, 0, 0, 1],
             on_press=self.screen_manager.play_toggle,
-            pos_hint={'center_x': 0.5, 'center_y': 0.5},
+            pos_hint={'center_x': 0.5, 'center_y': 0.4},
         )
         self.spinner.option_cls = CustomSpinnerOption
         self.add_widget(Image(source='imgs/background_mode.png', allow_stretch=True, keep_ratio=False))
+        self.add_widget(Image(source='imgs/bilcko_logo.png', allow_stretch=True,
+                            pos_hint={'center_x': 0.5, 'center_y': 0.7},
+                              size_hint=(0.5, 0.3), keep_ratio=False))
         self.lang_data = lang_data
         self.add_widget(self.spinner)
         self.add_back_btn()
