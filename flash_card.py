@@ -49,8 +49,8 @@ class FlashCardScreen(Screen):
 
     def __init__(self, lang_data, screen_manager, **kwargs):
         super().__init__(**kwargs)
-        self.round_sentences = [['Они не будут работающими  (продолжительное не будет длиться)',
-                                 'hey won\'t have been working']]
+        self.prev_viewing_card = None
+        self.round_sentences = []
         self.deck_for_repeat = self.round_sentences.copy()
         self.viewing_card = self.get_random_place()
         self.flash_card = FlashCard(self.viewing_card, self.get_left_cards())
@@ -79,7 +79,6 @@ class FlashCardScreen(Screen):
         if 'PC' in aim:
             self.chose_tense_type('PerfectContinuous', aim)
         self.deck_for_repeat = self.round_sentences.copy()
-        self.viewing_card = self.get_random_place()
         self.passed_cards = 0
         self.all_mistakes_count = 0
         self.start_time = time.time()
@@ -87,7 +86,7 @@ class FlashCardScreen(Screen):
 
     def card_was_failed(self):
         self.screen_manager.play_lose()
-        self.failed_cards.append(self.viewing_card)
+        self.failed_cards.append(self.prev_viewing_card)
 
     def load_old_deck(self):
         self.round_sentences = self.deck_for_repeat.copy()
@@ -100,11 +99,16 @@ class FlashCardScreen(Screen):
         self.all_mistakes_count = 0
 
     def get_random_place(self):
-        place = self.round_sentences[random.randint(0, len(self.round_sentences) - 1)]
-        index = self.round_sentences.index(place)
-        place = self.round_sentences[index]
-        self.round_sentences.pop(index)
-        return place
+        if len(self.round_sentences):
+            place = self.round_sentences[random.randint(0, len(self.round_sentences) - 1)]
+            index = self.round_sentences.index(place)
+            place = self.round_sentences[index]
+            self.round_sentences.pop(index)
+            return place
+        else:
+            return ['Они не будут работающими  (продолжительное не будет длиться)',
+                                 'hey won\'t have been working']
+
 
     def chose_tense_type(self, some_sentences_pair, aim):
         if 'NT' in aim:
@@ -126,7 +130,7 @@ class FlashCardScreen(Screen):
                 self.round_sentences.append(s)
 
     def get_left_cards(self):
-        return str(len(self.round_sentences)+len(self.failed_cards)+1)
+        return str(len(self.round_sentences)+len(self.failed_cards)) + ' left'
 
     def next_card(self, animation='', rotate=''):
         self.passed_cards += 1
@@ -137,13 +141,16 @@ class FlashCardScreen(Screen):
         self.add_widget(self.flash_card)
         animation = Animation(y=0, duration=0.1)
         animation.start(self)
+
         if len(self.round_sentences) > 0:
+            self.prev_viewing_card = self.viewing_card
             self.viewing_card = self.get_random_place()
         elif len(self.failed_cards):
             self.all_mistakes_count += len(self.failed_cards)
             for f_cards in self.failed_cards:
                 self.round_sentences.append(f_cards)
             self.failed_cards = []
+            self.prev_viewing_card = self.viewing_card
             self.viewing_card = self.get_random_place()
         else:
             pass_time = round(time.time() - self.start_time, 1)
@@ -231,12 +238,11 @@ class FlashCard(FloatLayout, DragBehavior):
                     self.is_back_card = True
 
             elif touch.x < touch.touch_down_x:
-
+                self.parent.card_was_failed()
                 self.clear_widgets()
                 self.add_widget(self.fail)
                 # self.rot.angle -= 20
                 # Shift to the right
-                self.parent.card_was_failed()
                 animation = Animation(x=-1*(self.parent.width + self.width), duration=0.1)
                 animation.bind(on_complete=self.parent.next_card)
                 animation.start(self.parent)
