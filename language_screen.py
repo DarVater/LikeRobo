@@ -762,6 +762,7 @@ class CustomSpinnerOption(SpinnerOption):
 
 class LanguageScreen(Screen):
     def __init__(self, lang_data, screen_manager, **kwargs):
+        self.screen_manager = screen_manager
         super().__init__(**kwargs)
         self.spinner = Spinner(
             text=lang_data.selected_language,
@@ -770,11 +771,11 @@ class LanguageScreen(Screen):
             values=lang_data.get_text_from_map(title='languages'),
             size_hint=(0.5, 0.1),
             color=[0, 0, 0, 1],
+            on_press=self.screen_manager.play_toggle,
             pos_hint={'center_x': 0.5, 'center_y': 0.5},
         )
         self.spinner.option_cls = CustomSpinnerOption
         self.add_widget(Image(source='imgs/background_mode.png', allow_stretch=True, keep_ratio=False))
-        self.screen_manager = screen_manager
         self.lang_data = lang_data
         self.add_widget(self.spinner)
         self.add_back_btn()
@@ -785,7 +786,8 @@ class LanguageScreen(Screen):
 
     def add_back_btn(self):
         self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.99, 'top': 0.99})
-        self.button.bind(on_press=self.goto_main)
+        self.button.bind(on_release=self.goto_main,
+                            on_press=self.screen_manager.play_button)
         self.add_widget(self.button)
 
 

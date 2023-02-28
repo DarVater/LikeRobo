@@ -45,19 +45,23 @@ class ModeScreen(Screen):
                 if 1:  # tense type
                     self.tense_type1 = ToggleButton( border=(0, 0, 0, 0),
                                       background_normal='imgs/toogle_simple_normal.png',
+                                      on_press=self.screen_manager.play_toggle,
                                       background_down='imgs/toogle_simple_down.png',
                         text='', group='tense_type', state='down')
                     self.tense_type.add_widget(self.tense_type1)
                     self.tense_type2 = ToggleButton(border=(0, 0, 0, 0),
                                       background_normal='imgs/toogle_continuous_normal.png',
+                                      on_press=self.screen_manager.play_toggle,
                                       background_down='imgs/toogle_continuous_down.png')
                     self.tense_type.add_widget(self.tense_type2)
                     self.tense_type3 = ToggleButton(border=(0, 0, 0, 0),
                                       background_normal='imgs/toogle_perfect_normal.png',
+                                      on_press=self.screen_manager.play_toggle,
                                       background_down='imgs/toogle_perfect_down.png')
                     self.tense_type.add_widget(self.tense_type3)
                     self.tense_type4 = ToggleButton(border=(0, 0, 0, 0),
                                       background_normal='imgs/toogle_perfect_continuous_normal.png',
+                                      on_press=self.screen_manager.play_toggle,
                                       background_down='imgs/toogle_perfect_continuous_down.png')
                     self.tense_type.add_widget(self.tense_type4)
                 self.group1.add_widget(self.tense_type)
@@ -66,14 +70,17 @@ class ModeScreen(Screen):
                     self.sentence_type.add_widget(Label(size_hint=[.5, 1]))
                     self.sentence_type1 = ToggleButton(border=(0, 0, 0, 0),
                                       background_normal='imgs/toogle_positive_normal.png',
+                                      on_press=self.screen_manager.play_toggle,
                               background_down='imgs/toogle_positive_down.png', state='down')
                     self.sentence_type.add_widget(self.sentence_type1)
                     self.sentence_type2 = ToggleButton(border=(0, 0, 0, 0),
                                       background_normal='imgs/toogle_question_normal.png',
+                                      on_press=self.screen_manager.play_toggle,
                                       background_down='imgs/toogle_question_down.png')
                     self.sentence_type.add_widget(self.sentence_type2)
                     self.sentence_type3 = ToggleButton( border=(0, 0, 0, 0),
                                       background_normal='imgs/toogle_negative_normal.png',
+                                      on_press=self.screen_manager.play_toggle,
                                       background_down='imgs/toogle_negative_down.png')
                     self.sentence_type.add_widget(self.sentence_type3)
                     self.sentence_type.add_widget(Label(size_hint=[.5, 1]))
@@ -84,14 +91,17 @@ class ModeScreen(Screen):
                     self.sentence_time.add_widget(Label(size_hint=[.5, 1]))
                     self.tense1 = ToggleButton(border=(0, 0, 0, 0),
                                       background_normal='imgs/toogle_present_normal.png',
+                                      on_press=self.screen_manager.play_toggle,
                                       background_down='imgs/toogle_present_down.png', state='down' )
                     self.sentence_time.add_widget(self.tense1)
                     self.tense2 = ToggleButton(border=(0, 0, 0, 0),
                                       background_normal='imgs/toogle_future_normal.png',
+                                      on_press=self.screen_manager.play_toggle,
                                       background_down='imgs/toogle_future_down.png')
                     self.sentence_time.add_widget(self.tense2)
                     self.tense3 = ToggleButton(border=(0, 0, 0, 0),
                                       background_normal='imgs/toogle_past_normal.png',
+                                      on_press=self.screen_manager.play_toggle,
                                       background_down='imgs/toogle_past_down.png')
                     self.sentence_time.add_widget(self.tense3)
                     self.sentence_time.add_widget(Label(size_hint=[.5, 1]))
@@ -103,14 +113,14 @@ class ModeScreen(Screen):
     def add_back_btn(self):
         self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.99, 'top': 0.99},
                                   border=(0, 0, 0, 0),)
-        self.button.bind(on_press=self.goto_main)
+        self.button.bind(on_release=self.goto_main, on_press=self.screen_manager.play_button)
         self.add_widget(self.button)
 
     def add_run_round_btn(self):
         self.button = Button(border=(0, 0, 0, 0),
                                       background_normal='imgs/start_road_btn_normal.png',
                                       background_down='imgs/start_road_btn_down.png',
-                                     size_hint=[.3, .05],
+                                     size_hint=[.3, .05], on_press=self.screen_manager.play_start,
                                      pos_hint={'center_x': 0.5, 'center_y': .05})
         self.button.bind(on_press=self.run_round)
         self.add_widget(self.button)

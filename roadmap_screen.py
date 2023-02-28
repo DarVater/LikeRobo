@@ -113,13 +113,13 @@ class RoadmapScreen(Screen):
     def add_start_btn(self):
         self.button = Button(background_normal='imgs/start_road_btn_normal.png', border=(0, 0, 0, 0),
                              background_down='imgs/start_road_btn_down.png',
-            size_hint=[0.2, 0.04], pos_hint={'center_x': 0.5, 'center_y': 0.18})
-        self.button.bind(on_press=self.goto_round)
+                            size_hint=[0.2, 0.04], pos_hint={'center_x': 0.5, 'center_y': 0.18})
+        self.button.bind(on_release=self.goto_round, on_press=self.screen_manager.play_start)
         self.add_widget(self.button)
 
     def add_back_btn(self):
         self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.95, 'top': 0.90})
-        self.button.bind(on_press=self.goto_main)
+        self.button.bind( on_press=self.screen_manager.play_button, on_release=self.goto_main)
         self.add_widget(self.button)
 
     def goto_main(self, instance):

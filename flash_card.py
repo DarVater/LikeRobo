@@ -29,7 +29,7 @@ class FlashWrapperScreen(Screen):
     def add_back_btn(self):
         self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.99, 'top': 0.99},
                                   border=(0, 0, 0, 0),)
-        self.button.bind(on_press=self.goto_main)
+        self.button.bind(on_release=self.goto_main, on_press=self.screen_manager.play_button)
         self.add_widget(self.button)
 
     def goto_main(self, instance):
@@ -86,6 +86,7 @@ class FlashCardScreen(Screen):
         self.next_card()
 
     def card_was_failed(self):
+        self.screen_manager.play_lose()
         self.failed_cards.append(self.viewing_card)
 
     def load_old_deck(self):
@@ -220,8 +221,10 @@ class FlashCard(FloatLayout, DragBehavior):
                     animation = Animation(x=(self.parent.width + self.width), duration=0.1)
                     animation.bind(on_complete=self.parent.next_card)
                     animation.start(self.parent)
+                    self.parent.screen_manager.play_right()
                 else:
                     # Shift to the left
+                    self.parent.screen_manager.play_rotate()
                     animation = Animation(size_hint=(0, 0.8), duration=0.1)
                     animation.bind(on_complete=self.change_card_side)
                     animation.start(self.front)
@@ -267,10 +270,12 @@ class ResultsCard(Screen):
         if self.round_result < 3:
             self.time_color = (115, 43, 93)
             self.continue_btn()
+            self.screen_manager.play_won()
             self.screen_manager.get_screen('screen2').save_progress()
         else:
             self.time_color = (10, 84, 89)
             self.repeat_btn()
+            self.screen_manager.play_lose()
         self.passed_cards = Label(text=str(self.round_result), color=self.time_color, font_size='15sp')
         self.result_grid.add_widget(self.passed_cards)
         self.add_back_btn()
@@ -281,7 +286,7 @@ class ResultsCard(Screen):
                                       background_normal='imgs/continue_normal.png',
                                       background_down='imgs/continue_down.png',
                                       pos_hint={'center_x': 0.50, 'top': 0.185})
-        self.continue_button.bind(on_press=self.continue_road_map)
+        self.continue_button.bind(on_release=self.continue_road_map, on_press=self.screen_manager.play_button)
         self.add_widget(self.continue_button)
 
     def repeat_btn(self):
@@ -289,7 +294,7 @@ class ResultsCard(Screen):
                                       background_normal='imgs/repeat_normal.png',
                                       background_down='imgs/repeat_down.png',
                                       pos_hint={'center_x': 0.50, 'top': 0.185})
-        self.continue_button.bind(on_press=self.repeat_deck)
+        self.continue_button.bind(on_release=self.repeat_deck, on_press=self.screen_manager.play_button)
 
         self.add_widget(self.continue_button)
 
@@ -301,18 +306,17 @@ class ResultsCard(Screen):
 
     def add_back_btn(self):
         self.button = BackButton(size_hint=[.2, .1], size=(80, 80), pos_hint={'right': 0.99, 'top': 0.99})
-        self.button.bind(on_press=self.goto_main)
+        self.button.bind(on_release=self.goto_main, on_press=self.screen_manager.play_button)
         self.add_widget(self.button)
 
     def continue_road_map(self, instance):
         animation = Animation(y=-180, duration=0.5)
         animation.start(self)
-        self.screen_manager.ads.show_rewarded_ad()
         from kivmob import TestIds
         from kivy.utils import platform
-        if platform != "android":
-            self.screen_manager.ads.load_rewarded_ad(TestIds.REWARDED_VIDEO)
-            self.screen_manager.ads.load_rewarded_ad(TestIds.REWARDED_VIDEO)
+        if platform == "android":
+            self.screen_manager.ads.show_rewarded_ad()
+            self.screen_manager.ads.load_rewarded_ad(self.screen_manager.ads_ids['REWARDED_VIDEO'])
         self.screen_manager.current = 'screen2'
 
     def goto_main(self, instance):

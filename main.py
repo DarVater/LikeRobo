@@ -1,5 +1,6 @@
-from kivmob import KivMob, TestIds, RewardedListenerInterface
+from kivmob import KivMob, RewardedListenerInterface, TestIds
 from kivy.app import App
+from kivy.core.audio import SoundLoader
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
@@ -14,6 +15,8 @@ from roadmap_screen import RoadmapScreen
 from flash_card import FlashWrapperScreen
 from mode_screen import ModeScreen
 from kivy.config import Config
+
+test_ads = True
 
 Config.set('kivy','window_icon','imgs/icon.png')
 
@@ -35,9 +38,10 @@ class MainScreen(Screen):
 
     def add_button_to_screen(self, title, foo):
         button2 = Button(border=(0, 0, 0, 0), text='[color=000]'+title+'[/color]', font_size='17sp',
-                                      background_normal='imgs/main_button_normal.png', markup=True,
-                                      background_down='imgs/main_button_down.png',)
-        button2.bind(on_press=foo)
+                            background_normal='imgs/main_button_normal.png', markup=True,
+                            background_down='imgs/main_button_down.png', on_release=foo,
+                            on_press=screen_manager.play_button)
+
         self.button_grid.add_widget(button2)
 
     def goto_screen2(self, instance):
@@ -53,6 +57,48 @@ class MainScreen(Screen):
         App.get_running_app().stop()
 
 screen_manager = ScreenManager()
+
+sound = None
+def start_play_start(df=''):
+    return start_play('start')
+def start_play_wrong(df=''):
+    return start_play('wrong')
+def start_play_rotate(df=''):
+    return start_play('rotate')
+def start_play_right(df=''):
+    return start_play('right')
+
+def start_play_button(df=''):
+    return start_play('button')
+
+def start_play_lose(df=''):
+    return start_play('lose')
+def start_play_won(df=''):
+    return start_play('won')
+
+def start_play_toggle(df=''):
+    return start_play('toggle')
+
+def start_play(file):
+    global sound
+    source = 'songs/' + file + '.mp3'
+    if sound:
+        sound.stop()
+    sound = SoundLoader.load(source)
+    if sound:
+        return sound.play()
+    else:
+        print('Dont find' + source)
+
+screen_manager.play_button = start_play_button
+screen_manager.play_toggle = start_play_toggle
+screen_manager.play_start = start_play_start
+screen_manager.play_wrong = start_play_wrong
+screen_manager.play_rotate = start_play_rotate
+screen_manager.play_right = start_play_right
+screen_manager.play_won = start_play_won
+screen_manager.play_lose = start_play_lose
+
 
 def screen_manager_rebuild(selected_language):
     global app_data, store
@@ -82,29 +128,40 @@ lang_data.update_language(selected_language)
 create_widget_screens()
 screen_manager.current = 'screen1'
 
-screen_manager.rebuild = screen_manager_rebuild
-if platform != "android":
-    screen_manager.ads = None
 
+if test_ads != True:
+    screen_manager.ads_ids = {
+        'APP': 'ca-app-pub-9906169229834445~1570037277',
+        'BANNER': 'ca-app-pub-9906169229834445/6439220570',
+        'REWARDED_VIDEO': 'ca-app-pub-9906169229834445/9364437240'
+    }
+else:
+    screen_manager.ads_ids = {
+        'APP': TestIds.APP,
+        'BANNER': TestIds.BANNER,
+        'REWARDED_VIDEO': TestIds.REWARDED_VIDEO
+    }
+
+screen_manager.rebuild = screen_manager_rebuild
+if platform == "android":
+    screen_manager.ads = None
 
 class MyApp(App):
     def build(self):
-        if platform != "android":
-            APP = 'ca-app-pub-9906169229834445~1570037277'
-            BANNER = 'ca-app-pub-9906169229834445/6439220570'
-            screen_manager.ads = KivMob(TestIds.APP)
+        if platform == "android":
+            screen_manager.ads = KivMob(screen_manager.ads_ids['APP'])
             # self.ads.new_banner(TestIds.BANNER)
             # self.ads.request_banner()
             # self.ads.show_banner()
-            screen_manager.ads.load_rewarded_ad(TestIds.REWARDED_VIDEO)
+            screen_manager.ads.load_rewarded_ad(screen_manager.ads_ids['REWARDED_VIDEO'])
             screen_manager.ads.set_rewarded_ad_listener(RewardedListenerInterface())
         self.icon = 'imgs/icon.png'
         self.loaded = 'imgs/background_main.png'
         return screen_manager
 
     def on_resume(self):
-        if platform != "android":
-            self.ads.load_rewarded_ad(TestIds.REWARDED_VIDEO)
+        if platform == "android":
+            self.ads.load_rewarded_ad(screen_manager.ads_ids['REWARDED_VIDEO'])
 
 if __name__ == '__main__':
     MyApp().run()

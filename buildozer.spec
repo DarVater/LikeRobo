@@ -29,7 +29,7 @@ source.exclude_dirs = bin
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 1.0
+version = 1.0.4
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
@@ -201,7 +201,7 @@ android.ndk = 25b
 #android.add_resources =
 
 # (list) Gradle dependencies to add
-android.gradle_dependencies = com.google.firebase:firebase-ads:15.0.0
+android.gradle_dependencies = com.google.firebase:firebase-ads:19.2.0
 
 # (bool) Enable AndroidX support. Enable when 'android.gradle_dependencies'
 # contains an 'androidx' package, or any package from Kotlin source.
@@ -260,8 +260,7 @@ android.enable_androidx = True
 #android.wakelock = False
 
 # (list) Android application meta-data to set (key=value format)
-android.meta_data = com.google.android.gms.ads.APPLICATION_ID=ca-app-pub-3940256099942544~3347511713
-
+android.meta_data = com.google.android.gms.ads.APPLICATION_ID=ca-app-pub-9906169229834445~1570037277
 
 # (list) Android library project to add (will be added in the
 # project.properties automatically.)
